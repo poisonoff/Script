@@ -1,7 +1,7 @@
 /*
 https://subscription.tapbots.net/subscription/2/verify url script-response-body ivory.js
 
-hostname=*.tapbots.net
+hostname=*.tapbots.net, *.tapbots.com
 */
 
 let obj = JSON.parse($response.body);
