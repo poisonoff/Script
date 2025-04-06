@@ -1,16 +1,19 @@
 /*
-Quantumult X Script for Ivory Subscription Bypass
 https://subscription.tapbots.net/subscription/2/verify url script-response-body ivory.js
 
-hostname=subscription.tapbots.net
+hostname=*.tapbots.net
 */
 
-try {
-    let obj = JSON.parse($response.body);
+let obj = JSON.parse($response.body);
 
-    // 修改订阅状态字段
-    obj.client_expires_at = 3471292800; // 永不过期时间（Unix 时间戳）
-    obj.can_trial = true;                // 启用试用功能
-    obj.subscription_status = active;  // 激活订阅状态
+// 添加伪造的交易记录
+obj["transactions"] = [
+  {
+    "transaction_id": "test123",
+    "purchase_date": "2025-04-06T00:00:00Z",
+    "expires_date": "2030-01-01T00:00:00Z",
+    "product_id": "ivory_premium"
+  }
+];
 
 $done({body: JSON.stringify(obj)});
