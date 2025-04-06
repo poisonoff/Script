@@ -1,5 +1,5 @@
 /*
-https://subscription.tapbots.com/subscription/2/verify url script-response-body ivory.js
+https://subscription.tapbots.net/subscription/2/verify url script-response-body ivory.js
 
 hostname=*.tapbots.net, *.tapbots.com
 */
