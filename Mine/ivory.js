@@ -1,45 +1,15 @@
-// pocketcasts-subscription.js - 用于复现 Pocket Casts 订阅状态修改
-// 保存到 Quantumult X 的 Scripts 文件夹
+[general]
+excluded_routes=192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 127.0.0.0/8, 100.64.0.0/10
+dns_exclusion_list=*.local
 
-let body = $response.body;
-let headers = $response.headers;
+[rewrite_local]
+# 拦截 Pocket Casts 订阅状态 API
+^https://api\.pocketcasts\.com/subscription/status.* url script-response-body PocketCastsSubscription
 
-// 检查 Content-Type 是否为 JSON 或 octet-stream
-if (headers['Content-Type'] && 
-    (headers['Content-Type'].includes('application/json') || headers['Content-Type'].includes('application/octet-stream'))) {
-    try {
-        let jsonBody = JSON.parse(body); // 尝试解析响应体为 JSON
-        if (jsonBody.subscription) {
-            // 修改订阅状态为活跃
-            jsonBody.subscription.status = "active";
-            jsonBody.subscription.expiry = "2099-12-31T23:59:59Z";
-            // 可选：添加其他字段，如 plan: "plus"（根据实际响应结构调整）
-            jsonBody.subscription.plan = jsonBody.subscription.plan || "plus";
-        } else {
-            // 如果没有 subscription 字段，创建默认结构
-            jsonBody.subscription = {
-                status: "active",
-                expiry: "2099-12-31T23:59:59Z",
-                plan: "plus"
-            };
-        }
-        body = JSON.stringify(jsonBody);
-        // 调试通知：确认脚本运行
-        $notify("Pocket Casts Rewrite", "Modified Response", JSON.stringify(jsonBody));
-    } catch (e) {
-        // 解析失败，保留原始 body 并通知错误
-        $notify("Pocket Casts Rewrite Error", "Parse Failed", e.message);
-        $done({ body: body });
-        return;
-    }
-} else {
-    // 非 JSON/octet-stream 响应，保留原样
-    $notify("Pocket Casts Rewrite", "Skipped", "Non-JSON response: " + headers['Content-Type']);
-}
+[mitm]
+# 启用 MITM 解密
+hostname = api.pocketcasts.com
 
-// 返回修改后的响应
-$done({
-    status: $response.status,
-    headers: headers,
-    body: body
-});
+[script_local]
+# 内嵌脚本，修改响应体
+PocketCastsSubscription = type=http-response, pattern=^https://api\.pocketcasts\.com/subscription/status.*, script-path=inline://let body = $response.body; let headers = $response.headers; if (headers['Content-Type'] && (headers['Content-Type'].includes('application/json') || headers['Content-Type'].includes('application/octet-stream'))) { try { let jsonBody = JSON.parse(body); if (jsonBody.subscription) { jsonBody.subscription.status = "active"; jsonBody.subscription.expiry = "2099-12-31T23:59:59Z"; jsonBody.subscription.plan = jsonBody.subscription.plan || "plus"; } else { jsonBody.subscription = { status: "active", expiry: "2099-12-31T23:59:59Z", plan: "plus" }; } body = JSON.stringify(jsonBody); $notify("Pocket Casts Rewrite", "Modified", JSON.stringify(jsonBody)); } catch (e) { $notify("Pocket Casts Rewrite Error", "Parse Failed", e.message); $done({ body: body }); return; } } $done({ status: $response.status, headers: headers, body: body });
