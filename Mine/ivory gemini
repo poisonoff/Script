@@ -1,0 +1,22 @@
+let obj = JSON.parse($response.body);
+const expiryTime = 4070880000; // 2099年
+
+obj["can_trial"] = true;
+
+if (obj.transactions) {
+    obj.transactions.forEach(item => {
+        item["expires_at"] = expiryTime;
+        item["valid_until"] = expiryTime;
+        item["product_id"] = "com.tapbots.Ivory.yearly1";
+        item["auto_renew_status"] = true;
+    });
+} else {
+    obj["transactions"] = [{
+        "product_id": "com.tapbots.Ivory.yearly1",
+        "expires_at": expiryTime,
+        "valid_until": expiryTime,
+        "auto_renew_status": true
+    }];
+}
+
+$done({body: JSON.stringify(obj)});
