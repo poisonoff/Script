@@ -1,19 +1,21 @@
 /**
- * Pocket Casts Plus Unlock (Protobuf 注入)
- * 适配接口: https://api.pocketcasts.com/subscription/status
+ * 尝试使用更精简的 Plus 标志位进行绕过
  */
+const method = $request.method;
 
-const rawHex = "10011a06088ee0a3c90640024a2008f8fb2110d8da32181e2a0a08f8fb2110d8da32181e320808a4cd3210a3cd32523b0801100118022a06088ee0a3c9065224636f6d2e706f636b657463617374732e706c75732e796561726c792e726566657272616c9a0104506c757358017204506c75737a040801100182010608f5fe99d805";
+// 这是一段尝试只保留核心 Plus 授权的精简二进制
+// 注意：如果这也不行，说明 App 强制要求校验 Token 身份
+const genericPlusHex = "10011a06088ee0a3c906400282010608f5fe99d805"; 
 
-function toUint8Array(hex) {
+function toUint8(hex) {
     return new Uint8Array(hex.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16)));
 }
 
-// 替换响应体
-$done({
-    body: toUint8Array(rawHex).buffer,
-    headers: {
-        "Content-Type": "application/octet-stream",
-        "X-Modified-By": "Gemini-Thought-Partner"
-    }
-});
+if (method === "GET") {
+    $done({
+        body: toUint8(genericPlusHex).buffer,
+        headers: { "Content-Type": "application/octet-stream" }
+    });
+} else {
+    $done({});
+}
