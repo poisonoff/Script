@@ -1,0 +1,27 @@
+/**
+ * Pocket Casts Plus Unlock (Protobuf Version)
+ * 作用：拦截二进制响应并替换为已激活的高级会员数据
+ */
+
+const url = $request.url;
+const method = $request.method;
+
+// 你提供的包含 Plus 会员信息的原始 Hex 序列
+const plusHex = "10011a06088ee0a3c90640024a2008f8fb2110d8da32181e2a0a08f8fb2110d8da32181e320808a4cd3210a3cd32523b0801100118022a06088ee0a3c9065224636f6d2e706f636b657463617374732e706c75732e796561726c792e726566657272616c9a0104506c757358017204506c75737a040801100182010608f5fe99d805";
+
+function hexToUint8Array(hex) {
+    let typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16)));
+    return typedArray.buffer;
+}
+
+if (method === "GET") {
+    console.log("Pocket Casts: 成功拦截订阅请求，注入二进制 Plus 数据");
+    $done({
+        body: hexToUint8Array(plusHex),
+        headers: {
+            "Content-Type": "application/octet-stream"
+        }
+    });
+} else {
+    $done({});
+}
