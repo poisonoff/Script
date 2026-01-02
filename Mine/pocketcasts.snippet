@@ -1,8 +1,6 @@
-# Pocket Casts Plus 一键解锁插件
-# 包含域名解析和脚本关联
-
 [mitm]
 hostname = %APPEND% api.pocketcasts.com
 
 [rewrite_local]
+# 确保使用完整的 Raw 链接
 ^https?:\/\/api\.pocketcasts\.com\/subscription\/status url script-response-body https://raw.githubusercontent.com/poisonoff/Script/master/Mine/pocketcasts.js
