@@ -1,0 +1,10 @@
+# Name: Ivory Subscription Rewrite
+# Author: poisonoff
+# Desc: 包含 MITM 和 重写规则的一键配置
+
+[mitm]
+hostname = %APPEND% subscription.tapbots.net
+
+[rewrite_local]
+# 匹配你在第一张图中抓到的 URL
+^https?:\/\/subscription\.tapbots\.net\/subscription\/2\/verify url script-response-body https://raw.githubusercontent.com/poisonoff/Script/master/Mine/ivory.js
